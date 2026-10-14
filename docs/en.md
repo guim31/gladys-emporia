@@ -1,61 +1,183 @@
-# Demo Devices Template
+# Emporia Vue
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+## Overview
 
-## What you get
+This integration brings the **Emporia Vue** energy monitors (Vue 2, Vue 3 and their circuit
+sensors), the **Emporia smart outlets** and the **Emporia EV chargers** into Gladys, through the
+Emporia cloud — the same account as the Emporia Energy app.
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+- Power of the whole home and of every circuit (up to 16 per Vue), refreshed every minute.
+- Cumulative energy indexes (kWh), total and per circuit, which Gladys turns into 30-minute
+  consumption and cost in its energy tracking.
+- Solar production and grid export when the Vue is set up for solar.
+- Outlets: on/off, power, energy. Chargers: connector and charging state, power, energy, and —
+  only if you allow it — on/off and target current.
+- A dashboard widget, a scene trigger and a scene action.
+
+Developed without the hardware: feedback welcome. Not affiliated with Emporia Energy.
+
+## Requirements
+
+- Gladys Assistant 5.1.0 or later (energy contracts and pricing come with Gladys 5.2).
+- An Emporia account with an **email and password**, whose devices are set up in the Emporia
+  Energy app. Accounts signed in with Google or Apple, and accounts with multi-factor
+  authentication (MFA), are not supported.
+- Internet access from Gladys: everything goes through the Emporia cloud, there is no local API.
 
 ## Configuration
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+1. In Gladys, open **Integrations → Install from GitHub** and install
+   `https://github.com/guim31/gladys-emporia`, or find **Emporia Vue** in the catalog.
+2. Fill in the **email** and **password** of your Emporia account and save. The status turns to
+   _connected_ once Emporia accepts them.
+3. **Language of the feature names**: French by default; names are fixed when a device is added.
+4. **Allow controlling the EV chargers**: off by default (see below).
+5. Open the **Discovery** tab and add the devices you want. Nothing is read from Emporia for a
+   device you have not added.
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+The password stays in the Gladys configuration; the sign-in tokens are kept in the integration's
+`/data` volume so that a restart does not sign in again.
 
-## Actions
+## Devices
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+### Emporia Vue
 
-## Scenes
+One Gladys device per Vue, named as in the Emporia app.
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+| Feature                             | Type                             | Unit |
+| ----------------------------------- | -------------------------------- | ---- |
+| Total power                         | energy-sensor / power            | W    |
+| Total index                         | energy-sensor / index            | kWh  |
+| _Circuit_ – power (one per circuit) | energy-sensor / power            | W    |
+| _Circuit_ – index (one per circuit) | energy-sensor / index            | kWh  |
+| Unmonitored power                   | energy-sensor / power (signed)   | W    |
+| Grid power (solar Vue)              | grid-sensor / power (signed)     | W    |
+| Grid import index (solar Vue)       | energy-sensor / index            | kWh  |
+| Grid export index (solar Vue)       | grid-sensor / output-index       | kWh  |
+| _Circuit_ – production (solar)      | energy-production-sensor / power | W    |
+| _Circuit_ – production index        | energy-production-sensor / index | kWh  |
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+Circuits take the names given in the Emporia app; an unnamed circuit is called "Circuit _n_",
+and two circuits with the same name get their number. _Unmonitored power_ is what the circuit
+sensors do not see (mains minus circuits).
 
-## Dashboard
+### Outlets
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+On/off (controllable), power (W) and energy index (kWh).
+
+### EV chargers
+
+| Feature         | Values                                                               |
+| --------------- | -------------------------------------------------------------------- |
+| Connector       | available, occupied (vehicle plugged in), unavailable, faulted       |
+| Charging state  | charging, vehicle connected, paused by the vehicle or by the charger |
+| Charger enabled | on/off                                                               |
+| Target current  | 6 A to the charger maximum                                           |
+| Charging power  | W                                                                    |
+| Index           | kWh                                                                  |
+
+**Charger control is off by default**: _Charger enabled_ and _Target current_ are read-only,
+and a command is refused. Turn on _Allow controlling the EV chargers_ in the configuration, then
+use **Update** in the Discovery tab, to make them controllable. A wrong command could stop a
+charge you need in the morning: think twice before automating it.
+
+## Energy tracking and the sign of values
+
+Emporia gives the energy of a period, not a meter index. The integration builds the index
+itself: the sum of the completed days, read back from Emporia at the very end of each day, plus
+the energy of today so far. The index therefore matches the Emporia app, never goes back, and
+catches up the days missed while Gladys was stopped (31 days at most). It is updated every 5
+minutes; it is kept in `/data/energy.json`.
+
+Gladys derives the 30-minute consumption and the cost from every index (Gladys 5.x energy
+tracking). In the energy settings, choose the **Total index** (or the **Grid import index** of a
+solar Vue) as the main meter; the circuit, outlet and charger indexes become sub-meters. An
+outlet or a charger plugged on a monitored circuit is counted inside that circuit too: arrange
+the hierarchy to avoid counting it twice.
+
+Sign conventions:
+
+- Emporia reports generation as **negative**. A circuit of type _Solar/Generation_ is published
+  as a **positive production** (power and production index).
+- On a solar Vue, the mains is the **net exchange with the grid**: _Grid power_ is positive when
+  importing and **negative when exporting**. The consumption index then comes from the grid
+  import channel and the export from the grid export channel, when Emporia provides them.
+- A bidirectional circuit (a battery…) keeps its sign and gets no index, since its daily total
+  can be negative. So does _Unmonitored power_.
+- Any other circuit is published as a positive value, as the Emporia app shows it.
+
+## Widget
+
+**Emporia power** shows the total power of a Vue (live), its solar production when it has some,
+and the five circuits drawing the most right now, with their share of the total (not on a solar
+Vue, whose mains is a net exchange). Pick the Vue in the widget settings; empty, it shows the
+first Vue added to Gladys.
+
+## Scene trigger
+
+**Emporia device offline or back**: a Vue, an outlet or a charger lost (or found back) its link
+to the Emporia cloud. While offline, its readings stop: nothing else in Gladys tells you. Filters:
+the device, and the change (goes offline / comes back online). Variables: device name, new status.
+
+## Scene action
+
+**Emporia energy of the day**: for a chosen device, returns the energy taken from the grid today
+(kWh), the solar production today (kWh), the circuit that used the most today and its energy,
+and the current power (W). The values come from the latest readings (5 minutes at most).
+
+The configuration also has a **List my Emporia devices** button, which shows what the account
+holds (Vues with their number of circuits, outlets, chargers).
+
+## Scene examples
+
+- **Evening report**: every day at 21:00 → _Emporia energy of the day_ on the Vue → send a
+  message "Today: {{energy_today_kwh}} kWh from the grid, {{production_today_kwh}} kWh of solar;
+  first: {{top_circuit}} ({{top_circuit_kwh}} kWh)".
+- **Forgotten appliance**: when _Oven – power_ stays above 1500 W and nobody is home → notify.
+- **Blind monitoring**: when the Vue goes offline → send a message "The Emporia Vue no longer
+  reports, check its Wi-Fi".
+- **Solar surplus**: when _Grid power_ goes below −1500 W (exporting) → turn on the water heater
+  outlet.
+
+## Refresh and Emporia API usage
+
+The Emporia API is not public and has no published quota; the integration stays close to what
+the Emporia app and the Home Assistant integration do:
+
+- every minute, **one** request for the power of all the channels of all devices
+  (`getDeviceListUsages`, 1-minute average) and one for the outlets, chargers and connectivity;
+- every 5 minutes, one request for the energy of the day (and one per completed day to close);
+- every hour, the device list (names, circuits).
+
+Nothing is read while no Emporia device is added to Gladys. Only changed values are sent to
+Gladys, plus an unchanged value every 6 hours so that it never looks stale. A refused password is
+never retried on its own, to avoid locking the account.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"Emporia refused this email or password"**: check them in the Emporia app, then save the
+  configuration again (that is what retries).
+- **"Your Emporia account asks for a step…"**: MFA or a forced password change. Sign in once in
+  the Emporia app; MFA accounts cannot be used.
+- **"The Emporia cloud does not answer"**: the integration retries every minute and says when it
+  works again; check Gladys's Internet access, and Emporia's status in its app.
+- **A circuit shows no value**: Emporia sends no reading for an unused sensor. Name and set up the
+  circuit in the Emporia app.
+- **Names in the wrong language**: change the language, then delete and add the device again
+  (names are fixed at creation).
+- Logs: the integration page shows them; set `LOG_LEVEL=debug` for every cycle in detail.
+
+## Limitations
+
+- Developed without the hardware nor an Emporia account: tested against the published API
+  behaviour (PyEmVue and its simulator), not against real devices. Feedback welcome.
+- Cloud only: no reading while Internet or the Emporia cloud is down. The minute power is a
+  1-minute average, not an instant value.
+- The index is updated every 5 minutes, not read during the first 30 minutes after midnight (the
+  Emporia API may still answer the previous day), and a stop of more than 31 days loses the days
+  before.
+- On a solar Vue whose grid import channel Emporia does not provide, there is no consumption
+  index for the whole home (circuits keep theirs).
+- Accounts using Google, Apple or MFA sign-in are not supported. Emporia batteries, thermostats
+  and vehicles are not supported.
+- Not affiliated with Emporia Energy; "Emporia" and "Vue" are their trademarks.

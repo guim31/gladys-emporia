@@ -1,0 +1,54 @@
+{
+  "devicesConnected": [
+    {
+      "deviceGid": 480001,
+      "connected": true,
+      "offlineSince": null
+    },
+    {
+      "deviceGid": 480002,
+      "connected": true,
+      "offlineSince": null
+    },
+    {
+      "deviceGid": 480010,
+      "connected": true,
+      "offlineSince": null
+    },
+    {
+      "deviceGid": 480020,
+      "connected": true,
+      "offlineSince": null
+    }
+  ],
+  "evChargers": [
+    {
+      "deviceGid": 480020,
+      "loadGid": 0,
+      "message": "Charging",
+      "status": "Charging",
+      "icon": "CarCharging",
+      "iconLabel": "Charging",
+      "debugCode": "",
+      "iconDetailText": "Your EV is charging.",
+      "faultText": null,
+      "proControlCode": null,
+      "breakerPIN": "0000",
+      "chargerOn": true,
+      "chargingRate": 32,
+      "maxChargingRate": 40,
+      "loadManagementEnabled": false,
+      "hideChargeRateSliderText": null
+    }
+  ],
+  "loads": [],
+  "batteries": [],
+  "outlets": [
+    {
+      "deviceGid": 480010,
+      "outletOn": true,
+      "loadGid": 0,
+      "schedules": []
+    }
+  ]
+}

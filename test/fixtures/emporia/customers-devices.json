@@ -1,0 +1,430 @@
+{
+  "customerGid": 1234,
+  "email": "user@example.com",
+  "firstName": "Test",
+  "lastName": "User",
+  "createdAt": "2024-01-01T12:00:00.000Z",
+  "devices": [
+    {
+      "deviceGid": 480001,
+      "manufacturerDeviceId": "A2112A04B4AC67B2B5482F1",
+      "model": "VUE003",
+      "firmware": "Vue3-1700000000",
+      "parentDeviceGid": null,
+      "parentChannelNum": null,
+      "locationProperties": {
+        "deviceGid": 480001,
+        "deviceName": "Maison",
+        "displayName": "Maison",
+        "zipCode": "00000",
+        "timeZone": "America/Toronto",
+        "billingCycleStartDay": 1,
+        "usageCentPerKwHour": 12.5,
+        "peakDemandDollarPerKw": 0,
+        "locationInformation": {
+          "airConditioning": "true",
+          "heatSource": "electricFurnace",
+          "locationSqFt": "1800",
+          "numElectricCars": "1",
+          "locationType": "houseMultiLevel",
+          "numPeople": "3",
+          "swimmingPool": "false",
+          "hotTub": "false"
+        },
+        "latitudeLongitude": null,
+        "utilityRateGid": null,
+        "solar": true
+      },
+      "outlet": null,
+      "evCharger": null,
+      "battery": null,
+      "deviceConnected": {
+        "deviceGid": 480001,
+        "connected": true,
+        "offlineSince": null
+      },
+      "devices": [
+        {
+          "deviceGid": 480001,
+          "manufacturerDeviceId": "SXA2112A04B4AC67B2F10001",
+          "model": "WAT001",
+          "firmware": null,
+          "channels": [
+            {
+              "deviceGid": 480001,
+              "name": "Furnace",
+              "channelNum": "1",
+              "channelMultiplier": 1,
+              "channelTypeGid": 11,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Dryer",
+              "channelNum": "2",
+              "channelMultiplier": 1,
+              "channelTypeGid": 4,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Kitchen",
+              "channelNum": "3",
+              "channelMultiplier": 1,
+              "channelTypeGid": 16,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "A/C",
+              "channelNum": "4",
+              "channelMultiplier": 1,
+              "channelTypeGid": 1,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Solar",
+              "channelNum": "5",
+              "channelMultiplier": 1,
+              "channelTypeGid": 13,
+              "type": "FiftyAmpBidirectional",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Fridge",
+              "channelNum": "6",
+              "channelMultiplier": 1,
+              "channelTypeGid": 10,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Water heater",
+              "channelNum": "7",
+              "channelMultiplier": 1,
+              "channelTypeGid": 22,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": null,
+              "channelNum": "8",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Dishwasher",
+              "channelNum": "9",
+              "channelMultiplier": 1,
+              "channelTypeGid": 8,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Lights",
+              "channelNum": "10",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Lights",
+              "channelNum": "11",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Office",
+              "channelNum": "12",
+              "channelMultiplier": 1,
+              "channelTypeGid": 6,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Washer",
+              "channelNum": "13",
+              "channelMultiplier": 1,
+              "channelTypeGid": 5,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Oven",
+              "channelNum": "14",
+              "channelMultiplier": 1,
+              "channelTypeGid": 7,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": null,
+              "channelNum": "15",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480001,
+              "name": "Heat pump",
+              "channelNum": "16",
+              "channelMultiplier": 1,
+              "channelTypeGid": 12,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            }
+          ]
+        }
+      ],
+      "channels": [
+        {
+          "deviceGid": 480001,
+          "name": null,
+          "channelNum": "1,2,3",
+          "channelMultiplier": 1,
+          "channelTypeGid": null,
+          "type": "Main",
+          "parentChannelNum": null
+        }
+      ]
+    },
+    {
+      "deviceGid": 480002,
+      "manufacturerDeviceId": "A2112A04B4AC67B2B5482F2",
+      "model": "VUE002",
+      "firmware": "Vue2-434",
+      "parentDeviceGid": 480001,
+      "parentChannelNum": "16",
+      "locationProperties": {
+        "deviceGid": 480002,
+        "deviceName": "Garage",
+        "displayName": "Garage",
+        "zipCode": "00000",
+        "timeZone": "America/Toronto",
+        "billingCycleStartDay": 1,
+        "usageCentPerKwHour": 12.5,
+        "peakDemandDollarPerKw": 0,
+        "locationInformation": {
+          "airConditioning": "true",
+          "heatSource": "electricFurnace",
+          "locationSqFt": "1800",
+          "numElectricCars": "1",
+          "locationType": "houseMultiLevel",
+          "numPeople": "3",
+          "swimmingPool": "false",
+          "hotTub": "false"
+        },
+        "latitudeLongitude": null,
+        "utilityRateGid": null
+      },
+      "outlet": null,
+      "evCharger": null,
+      "battery": null,
+      "deviceConnected": {
+        "deviceGid": 480002,
+        "connected": true,
+        "offlineSince": null
+      },
+      "devices": [
+        {
+          "deviceGid": 480002,
+          "manufacturerDeviceId": "SXA2112A04B4AC67B2F10002",
+          "model": "WAT001",
+          "firmware": null,
+          "channels": [
+            {
+              "deviceGid": 480002,
+              "name": "Workbench",
+              "channelNum": "1",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480002,
+              "name": "Compressor",
+              "channelNum": "2",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480002,
+              "name": "Freezer",
+              "channelNum": "3",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            },
+            {
+              "deviceGid": 480002,
+              "name": "Lights",
+              "channelNum": "4",
+              "channelMultiplier": 1,
+              "channelTypeGid": null,
+              "type": "FiftyAmp",
+              "parentChannelNum": null
+            }
+          ]
+        }
+      ],
+      "channels": [
+        {
+          "deviceGid": 480002,
+          "name": null,
+          "channelNum": "1,2,3",
+          "channelMultiplier": 1,
+          "channelTypeGid": null,
+          "type": "Main",
+          "parentChannelNum": null
+        }
+      ]
+    },
+    {
+      "deviceGid": 480010,
+      "manufacturerDeviceId": "B0000C89109103C1290",
+      "model": "SSO001",
+      "firmware": "Outlet-488",
+      "parentDeviceGid": 480001,
+      "parentChannelNum": "3",
+      "locationProperties": {
+        "deviceGid": 480010,
+        "deviceName": "Bouilloire",
+        "displayName": "Bouilloire",
+        "zipCode": "00000",
+        "timeZone": "America/Toronto",
+        "billingCycleStartDay": 1,
+        "usageCentPerKwHour": 12.5,
+        "peakDemandDollarPerKw": 0,
+        "locationInformation": {
+          "airConditioning": "true",
+          "heatSource": "electricFurnace",
+          "locationSqFt": "1800",
+          "numElectricCars": "1",
+          "locationType": "houseMultiLevel",
+          "numPeople": "3",
+          "swimmingPool": "false",
+          "hotTub": "false"
+        },
+        "latitudeLongitude": null,
+        "utilityRateGid": null
+      },
+      "outlet": {
+        "deviceGid": 480010,
+        "outletOn": true,
+        "loadGid": 0,
+        "schedules": []
+      },
+      "evCharger": null,
+      "battery": null,
+      "deviceConnected": {
+        "deviceGid": 480010,
+        "connected": true,
+        "offlineSince": null
+      },
+      "devices": [],
+      "channels": [
+        {
+          "deviceGid": 480010,
+          "name": null,
+          "channelNum": "1,2,3",
+          "channelMultiplier": 1,
+          "channelTypeGid": 23,
+          "type": "FiftyAmp",
+          "parentChannelNum": null
+        }
+      ]
+    },
+    {
+      "deviceGid": 480020,
+      "manufacturerDeviceId": "D2112A04B4AC6C4523421",
+      "model": "VVDN01",
+      "firmware": "EVCharger-467",
+      "parentDeviceGid": 480001,
+      "parentChannelNum": "1,2,3",
+      "locationProperties": {
+        "deviceGid": 480020,
+        "deviceName": "Borne",
+        "displayName": "Borne",
+        "zipCode": "00000",
+        "timeZone": "America/Toronto",
+        "billingCycleStartDay": 1,
+        "usageCentPerKwHour": 12.5,
+        "peakDemandDollarPerKw": 0,
+        "locationInformation": {
+          "airConditioning": "true",
+          "heatSource": "electricFurnace",
+          "locationSqFt": "1800",
+          "numElectricCars": "1",
+          "locationType": "houseMultiLevel",
+          "numPeople": "3",
+          "swimmingPool": "false",
+          "hotTub": "false"
+        },
+        "latitudeLongitude": null,
+        "utilityRateGid": null
+      },
+      "outlet": null,
+      "evCharger": {
+        "deviceGid": 480020,
+        "loadGid": 0,
+        "message": "Charging",
+        "status": "Charging",
+        "icon": "CarCharging",
+        "iconLabel": "Charging",
+        "debugCode": "",
+        "iconDetailText": "Your EV is charging.",
+        "faultText": null,
+        "proControlCode": null,
+        "breakerPIN": "0000",
+        "chargerOn": true,
+        "chargingRate": 32,
+        "maxChargingRate": 40,
+        "loadManagementEnabled": false,
+        "hideChargeRateSliderText": null
+      },
+      "battery": null,
+      "deviceConnected": {
+        "deviceGid": 480020,
+        "connected": true,
+        "offlineSince": null
+      },
+      "devices": [],
+      "channels": [
+        {
+          "deviceGid": 480020,
+          "name": null,
+          "channelNum": "1,2,3",
+          "channelMultiplier": 1,
+          "channelTypeGid": 25,
+          "type": "FiftyAmp",
+          "parentChannelNum": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,41 +1,62 @@
 // -----------------------------------------------------------------------------
-// Scene actions (SDK v0.14+, Gladys 5.1+).
+// Scene trigger and scene action (Gladys 5.1+).
 //
-// A scene action is an OPERATION a scene author places in a scene, with
-// parameters and a result: "identify this device", "take a snapshot", "clean
-// these rooms". Each one is declared in the manifest `scene_actions` field
-// (key, label, `fields` in the config_schema grammar, scalar `outputs`) and
-// handled here, keyed by that same `key`; index.js registers every entry with
-// `gladys.onSceneAction(key, ...)`.
+// Trigger "device_connection_changed": an Emporia device lost (or found back)
+// its link to the Emporia cloud. Nothing else in Gladys says it: the power
+// features just stop moving. A Vue offline means the monitoring is blind.
 //
-// Scene TRIGGERS are the other direction ("this happened"): they are fired by
-// the device that observes the event, see src/devices/motionSensor.js.
-//
-// The rules that matter:
-//   - `fields` arrive RESOLVED: scene variables substituted, defaults applied,
-//     validated by the core; a `"source": "devices"` field is the chosen
-//     device external_id;
-//   - resolve an object of the declared `outputs` (scalars only), readable by
-//     the following actions of the scene, or `undefined` for none. Keys not
-//     declared in the manifest are dropped by the core;
-//   - throwing fails THIS action only: the scene logs it and continues. A
-//     scene action is never a condition: return an output and let the scene
-//     author gate on it;
-//   - never fire a scene event as a consequence of a received action: a scene
-//     bound to that event would loop through the integration.
+// Action "get_daily_summary": today's energy of a device so far, its biggest
+// circuit and its current power, as outputs for the next steps of a scene (an
+// evening message "23.4 kWh today, Dryer first with 5.1 kWh"). Gladys keeps
+// 30-minute consumptions, but a scene cannot add them up nor rank circuits.
 // -----------------------------------------------------------------------------
 
-import { createLogger } from '@gladysassistant/integration-sdk';
-import { signalDevice } from './devices/index.js';
+import { GRID_IMPORT, MAINS, minuteKwhToWatts, usageOf } from './emporia/model.js';
+import { findDevice, layoutOf } from './devices/index.js';
+import { TEXT } from './i18n.js';
 
-const logger = createLogger({ name: 'scenes' });
+export const SCENE_TRIGGER = { CONNECTION_CHANGED: 'device_connection_changed' };
+export const SCENE_TRIGGER_KEYS = Object.values(SCENE_TRIGGER);
+export const SCENE_ACTION = { DAILY_SUMMARY: 'get_daily_summary' };
 
-export const SCENE_ACTIONS = {
-  // The ack is awaited under the action's `timeout_seconds` (15 s in the
-  // manifest), counted from the moment the scene reaches the action.
-  async identify_device(gladys, { fields, config }) {
-    logger.info(`Scene action identify_device <- ${fields.device}`);
-    const signalled = await signalDevice(gladys, fields.device, config);
-    return { signalled };
-  },
-};
+const round3 = (value) => Math.round(value * 1000) / 1000;
+
+/**
+ * Outputs of get_daily_summary.
+ * @param {object} options
+ * @param {object} options.gladys
+ * @param {object} options.snapshot
+ * @param {string} options.deviceExternalId the device chosen in the scene
+ */
+export function dailySummary({ gladys, snapshot, deviceExternalId }) {
+  const { config } = snapshot;
+  const device = findDevice(gladys, snapshot.catalog, deviceExternalId);
+  if (!device) {
+    throw new Error(TEXT.deviceUnknown[config.language] ?? TEXT.deviceUnknown.en);
+  }
+  const energy = snapshot.energy;
+  const today = (num) => energy?.today(device.gid, num) ?? null;
+  const specs = layoutOf(device, snapshot);
+
+  // Energy taken from the grid: the mains, or its import half on a solar Vue.
+  const consumed = specs.some((spec) => spec.num === GRID_IMPORT)
+    ? today(GRID_IMPORT)
+    : today(MAINS);
+  const produced = specs
+    .filter((spec) => spec.kind === 'index' && spec.production)
+    .reduce((sum, spec) => sum + (today(spec.num) ?? 0), 0);
+  const circuits = specs
+    .filter((spec) => spec.kind === 'index' && spec.circuit && !spec.production)
+    .map((spec) => ({ name: spec.circuit, kwh: today(spec.num) }))
+    .filter((circuit) => circuit.kwh !== null)
+    .sort((a, b) => b.kwh - a.kwh);
+  const mainsKwh = usageOf(snapshot.usages, device.gid, MAINS);
+
+  return {
+    energy_today_kwh: consumed === null ? 0 : round3(consumed),
+    production_today_kwh: round3(produced),
+    top_circuit: circuits[0]?.name ?? '',
+    top_circuit_kwh: circuits[0] ? round3(circuits[0].kwh) : 0,
+    power_w: mainsKwh === null ? 0 : minuteKwhToWatts(mainsKwh),
+  };
+}

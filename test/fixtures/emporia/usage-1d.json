@@ -1,0 +1,256 @@
+{
+  "deviceListUsages": {
+    "instant": "2026-10-14T18:15:00Z",
+    "scale": "1D",
+    "energyUnit": "KilowattHours",
+    "devices": [
+      {
+        "deviceGid": 480001,
+        "channelUsages": [
+          {
+            "name": "Main",
+            "usage": 24.2,
+            "deviceGid": 480001,
+            "channelNum": "1,2,3",
+            "percentage": 0,
+            "nestedDevices": [
+              {
+                "deviceGid": 480020,
+                "channelUsages": [
+                  {
+                    "name": "Main",
+                    "usage": 11.4,
+                    "deviceGid": 480020,
+                    "channelNum": "1,2,3",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Furnace",
+            "usage": 4.1,
+            "deviceGid": 480001,
+            "channelNum": "1",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Dryer",
+            "usage": 2.2,
+            "deviceGid": 480001,
+            "channelNum": "2",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Kitchen",
+            "usage": 3.3,
+            "deviceGid": 480001,
+            "channelNum": "3",
+            "percentage": 0,
+            "nestedDevices": [
+              {
+                "deviceGid": 480010,
+                "channelUsages": [
+                  {
+                    "name": "Main",
+                    "usage": 0.42,
+                    "deviceGid": 480010,
+                    "channelNum": "1,2,3",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "A/C",
+            "usage": 5,
+            "deviceGid": 480001,
+            "channelNum": "4",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Solar",
+            "usage": -9.6,
+            "deviceGid": 480001,
+            "channelNum": "5",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Fridge",
+            "usage": 1.2,
+            "deviceGid": 480001,
+            "channelNum": "6",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Water heater",
+            "usage": 2.8,
+            "deviceGid": 480001,
+            "channelNum": "7",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Channel 8",
+            "usage": 0.3,
+            "deviceGid": 480001,
+            "channelNum": "8",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Dishwasher",
+            "usage": 0.9,
+            "deviceGid": 480001,
+            "channelNum": "9",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Lights",
+            "usage": 0.7,
+            "deviceGid": 480001,
+            "channelNum": "10",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Lights",
+            "usage": 0.4,
+            "deviceGid": 480001,
+            "channelNum": "11",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Office",
+            "usage": 1.8,
+            "deviceGid": 480001,
+            "channelNum": "12",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Washer",
+            "usage": 0.6,
+            "deviceGid": 480001,
+            "channelNum": "13",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Oven",
+            "usage": 1.1,
+            "deviceGid": 480001,
+            "channelNum": "14",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Channel 15",
+            "usage": null,
+            "deviceGid": 480001,
+            "channelNum": "15",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "Heat pump",
+            "usage": 4.4,
+            "deviceGid": 480001,
+            "channelNum": "16",
+            "percentage": 0,
+            "nestedDevices": [
+              {
+                "deviceGid": 480002,
+                "channelUsages": [
+                  {
+                    "name": "Main",
+                    "usage": 4.4,
+                    "deviceGid": 480002,
+                    "channelNum": "1,2,3",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  },
+                  {
+                    "name": "Workbench",
+                    "usage": 1,
+                    "deviceGid": 480002,
+                    "channelNum": "1",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  },
+                  {
+                    "name": "Compressor",
+                    "usage": 2.1,
+                    "deviceGid": 480002,
+                    "channelNum": "2",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  },
+                  {
+                    "name": "Freezer",
+                    "usage": 1,
+                    "deviceGid": 480002,
+                    "channelNum": "3",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  },
+                  {
+                    "name": "Lights",
+                    "usage": 0.2,
+                    "deviceGid": 480002,
+                    "channelNum": "4",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  },
+                  {
+                    "name": "Balance",
+                    "usage": 0.1,
+                    "deviceGid": 480002,
+                    "channelNum": "Balance",
+                    "percentage": 0,
+                    "nestedDevices": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Balance",
+            "usage": 3.1,
+            "deviceGid": 480001,
+            "channelNum": "Balance",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "MainsFromGrid",
+            "usage": 29,
+            "deviceGid": 480001,
+            "channelNum": "MainsFromGrid",
+            "percentage": 0,
+            "nestedDevices": []
+          },
+          {
+            "name": "MainsToGrid",
+            "usage": 4.8,
+            "deviceGid": 480001,
+            "channelNum": "MainsToGrid",
+            "percentage": 0,
+            "nestedDevices": []
+          }
+        ]
+      }
+    ]
+  }
+}
