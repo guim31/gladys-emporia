@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-14
+
 ### Added
 
 - Emporia Vue energy monitors (Vue 2, Vue 3): total power and power of every
@@ -38,4 +40,5 @@ the notes of the version's GitHub Release.
 - Feature names, messages and documentation in English, French, German and
   Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-emporia/commits/main
+[Unreleased]: https://github.com/guim31/gladys-emporia/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-emporia/releases/tag/v1.0.1

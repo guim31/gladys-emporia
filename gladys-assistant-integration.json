@@ -8,8 +8,8 @@
     "de": "Emporia-Vue-Energiemonitore, Steckdosen und Ladestationen: Leistung und Energie je Stromkreis.",
     "es": "Monitores Emporia Vue, enchufes y cargadores Emporia: potencia y energía por circuito."
   },
-  "version": "1.0.0",
-  "docker_image": "ghcr.io/guim31/gladys-emporia:1.0.0",
+  "version": "1.0.1",
+  "docker_image": "ghcr.io/guim31/gladys-emporia:1.0.1",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/guim31/gladys-emporia/main/cover.png",
   "categories": ["energy"],
