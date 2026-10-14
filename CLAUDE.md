@@ -11,6 +11,9 @@ Gladys through
 [`@gladysassistant/integration-sdk`](https://github.com/GladysAssistant/integration-sdk-js),
 its only runtime dependency. It started from the official JavaScript template.
 
+This one brings the **Emporia Vue** energy monitors, Emporia outlets and EV
+chargers into Gladys through the Emporia cloud (see "Emporia" at the end).
+
 ## Commands
 
 ```bash
@@ -31,16 +34,25 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: createApp() registers the handlers before connect()
+src/app.js                        handlers, polling cycle, connection status, quiet logs
+src/poller.js                     the container's own timer (the core's onPoll is a fallback)
+src/emporia/srp.js                SRP-6a, Cognito flavour (BigInt + node:crypto, no dependency)
+src/emporia/cognito.js            Cognito sign-in (USER_SRP_AUTH) and refresh
+src/emporia/api.js                Emporia REST client; session (tokens) in /data/session.json
+src/emporia/model.js              payloads → plain objects (device list, usage tree, status)
+src/energy.js                     cumulative kWh indexes from the daily totals, /data/energy.json
+src/devices/index.js              registry, Gladys device building, states, commands
+src/devices/<type>.js             monitor (Vue), outlet, charger: feature layouts
+src/scenes.js                     scene trigger key, scene action (daily summary)
+src/widgets.js                    dashboard widget content (power overview)
+src/i18n.js                       feature names and messages in en, fr, de, es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/store.js                      JSON files under /data (atomic write, mode 600)
+scripts/probe.mjs                 checks the real Cognito/Emporia services (not shipped in the image)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+docs/{en,fr,de,es}.md             user documentation, same sections (test/i18n.test.js)
+test/                             node --test: SDK's fake Gladys + test/helpers/fakeEmporia.js
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +82,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** is in four languages (English, French, German with
+  "du", Spanish with "usted"): action messages, manifest texts, feature names,
+  widget texts, and `docs/en.md` / `fr.md` / `de.md` / `es.md`, kept in sync
+  with the same sections. `test/i18n.test.js` enforces it.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +247,45 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Emporia (propre à cette intégration)
+
+**API** (non publique, documentée par PyEmVue, MIT) :
+
+- Connexion AWS Cognito, pool `us-east-2_ghlOXVLi1`, client public `4qte47jbstod8apnfic0bunmrq`
+  (celui de l’appli, sans secret : aucune signature AWS). Flux `USER_SRP_AUTH` →
+  `PASSWORD_VERIFIER` → `RespondToAuthChallenge`, puis `REFRESH_TOKEN_AUTH` (qui ne renvoie pas de
+  nouveau refresh token : garder l’ancien). `src/emporia/srp.js` est vérifié contre un vecteur
+  calculé par pycognito (`test/fixtures/srp-pycognito-vector.json`) : ne pas le « simplifier ».
+  `padHex` suit la bibliothèque JS officielle (sel converti en entier puis re-paddé). Le jour du
+  `TIMESTAMP` n’a pas de zéro initial (« Wed Oct 4 … »).
+- C’est l’**ID token** (pas l’access token) qui va dans l’en-tête `authtoken` de
+  `https://api.emporiaenergy.com`.
+- Un mot de passe refusé n’est **jamais réessayé seul** (Cognito finirait par bloquer le compte) :
+  seul un changement de configuration relance. Pas de MFA, pas de connexion Google/Apple.
+- `customers/devices` : les circuits d’un Vue sont dans un sous-appareil **de même `deviceGid`**
+  (modèle WAT001), à fusionner. Prises (`outlet`) et bornes (`evCharger`) sont des appareils à part.
+- `getDeviceListUsages` répond un **arbre** : une prise, une borne ou un second Vue n’apparaissent
+  qu’imbriqués (`nestedDevices`) dans le canal du Vue où ils sont branchés. Toujours demander
+  **tous** les gid et aplatir. `usage` est en kWh sur la période (`1MIN` × 60 000 = W) et peut être
+  `null` (capteur inutilisé, mesure manquante) : ne rien publier alors.
+- Canaux spéciaux : `1,2,3` (secteur), `Balance` (secteur − circuits, signé), et, pour un Vue
+  solaire, `MainsFromGrid` / `MainsToGrid` qui n’existent **que dans l’usage**, pas dans la liste
+  des appareils. Type de canal 13 = Solar/Generation (production négative chez Emporia), type
+  `…Bidirectional` = signé.
+- Pas d’index chez Emporia : `src/energy.js` en construit un (jours clos relus à 23:59:59 locale du
+  fuseau du Vue + jour en cours). Le total `1D` peut encore valoir la veille juste après minuit
+  (constaté par l’intégration HACS) : pas de lecture du jour pendant 30 min après minuit.
+- Les types qui donnent un suivi d’énergie dans le cœur sont `energy-sensor/index`,
+  `energy-sensor/energy`, `switch/energy` (consommation) et `energy-production-sensor/index`
+  (production). `grid-sensor/input-index` et `output-index` **n’en font pas partie** en 5.2.1 :
+  l’import réseau d’un Vue solaire est donc publié en `energy-sensor/index`.
+- Bornes : `chargingRate` entre 6 A et `maxChargingRate`. `breakerPIN` est renvoyé tel quel au
+  `PUT devices/evcharger` et ne doit jamais être journalisé. Pilotage désactivé par défaut
+  (`charger_control`).
+- Aucun quota publié : 1 requête d’usage + 1 de statut par minute, l’énergie du jour toutes les
+  5 min, la liste des appareils toutes les heures, rien tant qu’aucun appareil n’est ajouté.
+- Depuis une session de code (14/10/2026), Cognito répond (vrai défi `PASSWORD_VERIFIER`, compte
+  factice refusé proprement en `NotAuthorizedException`) mais `api.emporiaenergy.com` ne se
+  résout pas : `scripts/probe.mjs` éprouve l’API réelle depuis une machine qui a le réseau, en
+  lecture seule, sans rien afficher de sensible (`EMPORIA_EMAIL` / `EMPORIA_PASSWORD`).

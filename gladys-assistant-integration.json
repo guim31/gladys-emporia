@@ -1,147 +1,228 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Emporia Vue",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Emporia Vue energy monitors, smart outlets and EV chargers: power and energy per circuit.",
+    "fr": "Moniteurs Emporia Vue, prises et bornes Emporia : puissance et énergie par circuit.",
+    "de": "Emporia-Vue-Energiemonitore, Steckdosen und Ladestationen: Leistung und Energie je Stromkreis.",
+    "es": "Monitores Emporia Vue, enchufes y cargadores Emporia: potencia y energía por circuito."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-emporia:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-emporia/main/cover.png",
+  "categories": ["energy"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your Emporia account",
+        "fr": "Votre compte Emporia",
+        "de": "Dein Emporia-Konto",
+        "es": "Su cuenta Emporia"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Use the email and password of the Emporia Energy app. The integration reads the Emporia cloud once a minute. Accounts signed in with Google or Apple, or protected by MFA, are not supported. Not affiliated with Emporia Energy.",
+        "fr": "Utilisez l’e-mail et le mot de passe de l’appli Emporia Energy. L’intégration lit le cloud Emporia une fois par minute. Les comptes connectés par Google ou Apple, ou protégés par MFA, ne sont pas pris en charge. Sans lien avec Emporia Energy.",
+        "de": "Nutze die E-Mail-Adresse und das Passwort der Emporia-Energy-App. Die Integration liest die Emporia-Cloud einmal pro Minute. Konten mit Google- oder Apple-Anmeldung oder mit MFA werden nicht unterstützt. Nicht mit Emporia Energy verbunden.",
+        "es": "Utilice el correo y la contraseña de la app Emporia Energy. La integración lee la nube de Emporia una vez por minuto. Las cuentas con inicio de sesión de Google o Apple, o protegidas por MFA, no son compatibles. Sin relación con Emporia Energy."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://www.emporiaenergy.com/",
+          "label": {
+            "en": "Emporia Energy",
+            "fr": "Emporia Energy",
+            "de": "Emporia Energy",
+            "es": "Emporia Energy"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "email",
+      "type": "string",
+      "label": {
+        "en": "Email",
+        "fr": "E-mail",
+        "de": "E-Mail-Adresse",
+        "es": "Correo electrónico"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "placeholder": {
+        "en": "you@example.com",
+        "fr": "vous@exemple.fr",
+        "de": "du@beispiel.de",
+        "es": "usted@ejemplo.es"
+      },
+      "required": true
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
+      "required": true
     },
     {
-      "key": "unit",
+      "key": "language",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "label": {
+        "en": "Language of the feature names",
+        "fr": "Langue des noms de fonctionnalités",
+        "de": "Sprache der Funktionsnamen",
+        "es": "Idioma de los nombres de funciones"
+      },
+      "description": {
+        "en": "Names are fixed when a device is added to Gladys.",
+        "fr": "Les noms sont figés à l’ajout d’un appareil dans Gladys.",
+        "de": "Die Namen werden beim Hinzufügen eines Geräts zu Gladys festgelegt.",
+        "es": "Los nombres se fijan al añadir un dispositivo a Gladys."
+      },
       "required": false,
-      "default": "celsius",
+      "default": "fr",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "en",
+          "label": { "en": "English", "fr": "Anglais", "de": "Englisch", "es": "Inglés" }
+        },
+        {
+          "value": "fr",
+          "label": { "en": "French", "fr": "Français", "de": "Französisch", "es": "Francés" }
+        },
+        {
+          "value": "de",
+          "label": { "en": "German", "fr": "Allemand", "de": "Deutsch", "es": "Alemán" }
+        },
+        {
+          "value": "es",
+          "label": { "en": "Spanish", "fr": "Espagnol", "de": "Spanisch", "es": "Español" }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "charger_control",
+      "type": "boolean",
+      "label": {
+        "en": "Allow controlling the EV chargers",
+        "fr": "Autoriser le pilotage des bornes",
+        "de": "Steuerung der Ladestationen erlauben",
+        "es": "Permitir controlar los cargadores"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Off: chargers are read-only. On: Gladys can switch them and set the target current (6 A minimum).",
+        "fr": "Désactivé : les bornes sont en lecture seule. Activé : Gladys peut les couper et régler l’intensité de consigne (6 A minimum).",
+        "de": "Aus: Ladestationen sind nur lesbar. An: Gladys kann sie schalten und den Sollstrom einstellen (mindestens 6 A).",
+        "es": "Desactivado: los cargadores son de solo lectura. Activado: Gladys puede apagarlos y ajustar la corriente objetivo (6 A mínimo)."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": false
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
+      "key": "list_devices",
+      "label": {
+        "en": "List my Emporia devices",
+        "fr": "Lister mes appareils Emporia",
+        "de": "Meine Emporia-Geräte auflisten",
+        "es": "Listar mis dispositivos Emporia"
+      },
       "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "device_connection_changed",
+      "label": {
+        "en": "Emporia device offline or back",
+        "fr": "Appareil Emporia hors ligne ou de retour",
+        "de": "Emporia-Gerät offline oder zurück",
+        "es": "Dispositivo Emporia sin conexión o de vuelta"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "A Vue, outlet or charger lost or found back its link to the Emporia cloud: while offline, its readings stop.",
+        "fr": "Un Vue, une prise ou une borne a perdu ou retrouvé sa liaison au cloud Emporia : hors ligne, ses mesures s’arrêtent.",
+        "de": "Ein Vue, eine Steckdose oder Ladestation hat die Verbindung zur Emporia-Cloud verloren oder wiederhergestellt: offline stoppen die Messungen.",
+        "es": "Un Vue, un enchufe o un cargador perdió o recuperó su enlace con la nube de Emporia: sin conexión, sus mediciones se detienen."
       },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" }
         },
         {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "key": "status",
+          "type": "select",
+          "label": { "en": "Change", "fr": "Changement", "de": "Änderung", "es": "Cambio" },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "offline",
+              "label": {
+                "en": "Goes offline",
+                "fr": "Passe hors ligne",
+                "de": "Geht offline",
+                "es": "Se desconecta"
+              }
+            },
+            {
+              "value": "online",
+              "label": {
+                "en": "Comes back online",
+                "fr": "Revient en ligne",
+                "de": "Wieder online",
+                "es": "Vuelve a conectarse"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "device_name",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Device name",
+            "fr": "Nom de l’appareil",
+            "de": "Gerätename",
+            "es": "Nombre del dispositivo"
+          }
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "label": {
+            "en": "New status",
+            "fr": "Nouvel état",
+            "de": "Neuer Status",
+            "es": "Nuevo estado"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
+      "key": "get_daily_summary",
+      "label": {
+        "en": "Emporia energy of the day",
+        "fr": "Énergie Emporia du jour",
+        "de": "Emporia-Energie des Tages",
+        "es": "Energía Emporia del día"
+      },
       "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+        "en": "Today's energy so far, the biggest circuit and the current power, for the next steps (an evening message...).",
+        "fr": "Énergie du jour jusqu’ici, le circuit le plus gourmand et la puissance actuelle, pour les étapes suivantes (un message du soir…).",
+        "de": "Bisherige Energie des Tages, der größte Stromkreis und die aktuelle Leistung, für die nächsten Schritte (eine Abendnachricht…).",
+        "es": "Energía del día hasta ahora, el circuito que más consume y la potencia actual, para los pasos siguientes (un mensaje nocturno…)."
       },
       "timeout_seconds": 15,
       "fields": [
@@ -149,29 +230,99 @@
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" },
           "required": true
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "energy_today_kwh",
+          "type": "number",
+          "label": {
+            "en": "Energy from the grid today (kWh)",
+            "fr": "Énergie du réseau aujourd’hui (kWh)",
+            "de": "Netzenergie heute (kWh)",
+            "es": "Energía de la red hoy (kWh)"
+          }
+        },
+        {
+          "key": "production_today_kwh",
+          "type": "number",
+          "label": {
+            "en": "Solar production today (kWh)",
+            "fr": "Production solaire aujourd’hui (kWh)",
+            "de": "Solarproduktion heute (kWh)",
+            "es": "Producción solar hoy (kWh)"
+          }
+        },
+        {
+          "key": "top_circuit",
+          "type": "string",
+          "label": {
+            "en": "Biggest circuit today",
+            "fr": "Circuit le plus gourmand du jour",
+            "de": "Größter Stromkreis heute",
+            "es": "Circuito que más consume hoy"
+          }
+        },
+        {
+          "key": "top_circuit_kwh",
+          "type": "number",
+          "label": {
+            "en": "Energy of that circuit (kWh)",
+            "fr": "Énergie de ce circuit (kWh)",
+            "de": "Energie dieses Stromkreises (kWh)",
+            "es": "Energía de ese circuito (kWh)"
+          }
+        },
+        {
+          "key": "power_w",
+          "type": "number",
+          "label": {
+            "en": "Current power (W)",
+            "fr": "Puissance actuelle (W)",
+            "de": "Aktuelle Leistung (W)",
+            "es": "Potencia actual (W)"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "power_overview",
+      "label": {
+        "en": "Emporia power",
+        "fr": "Puissance Emporia",
+        "de": "Emporia-Leistung",
+        "es": "Potencia Emporia"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Total power of a Vue, its solar production and the circuits drawing the most.",
+        "fr": "Puissance totale d’un Vue, sa production solaire et les circuits qui consomment le plus.",
+        "de": "Gesamtleistung eines Vue, seine Solarproduktion und die Stromkreise mit dem höchsten Verbrauch.",
+        "es": "Potencia total de un Vue, su producción solar y los circuitos que más consumen."
+      },
+      "icon": "zap",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Emporia Vue",
+            "fr": "Emporia Vue",
+            "de": "Emporia Vue",
+            "es": "Emporia Vue"
+          },
+          "description": {
+            "en": "Empty: the first Vue added to Gladys.",
+            "fr": "Vide : le premier Vue ajouté à Gladys.",
+            "de": "Leer: der erste zu Gladys hinzugefügte Vue.",
+            "es": "Vacío: el primer Vue añadido a Gladys."
+          }
+        }
+      ]
     }
   ]
 }

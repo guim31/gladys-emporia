@@ -1,77 +1,77 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateWidgetContent } from '@gladysassistant/integration-sdk';
-import { createFakeGladys } from '@gladysassistant/integration-sdk/testing';
-import { buildDiscoveredDevices } from '../src/devices/index.js';
-import { simulateLanSession } from '../src/devices/plug.js';
-import { DEMO_STATUS_WIDGET, WIDGETS, refreshWidgets } from '../src/widgets.js';
-import { normalizeConfig } from '../src/config.js';
+import { createWorld } from './helpers/world.js';
+import { TEXT } from '../src/i18n.js';
 
-const gladys = createFakeGladys();
-const config = normalizeConfig();
-const demoStatus = WIDGETS[DEMO_STATUS_WIDGET];
+const get = (world, settings = {}, language = 'fr') =>
+  world.gladys.fake.widgetGet('power_overview', { settings, language });
 
-// What the SDK passes to onWidgetGet, plus the config index.js adds.
-const getContent = (cfg = config) =>
-  demoStatus.get(gladys, { settings: {}, language: 'en', units: 'metric', config: cfg });
-
-test('the demo_status content is rendered exactly as sent', async () => {
-  // [] = nothing the core would drop, truncate or trim to the content budget.
-  assert.deepEqual(validateWidgetContent(await getContent()), []);
-});
-
-test('the degraded plug connection content is valid too', async () => {
-  simulateLanSession(false);
+test('the power widget: total, solar, and the five circuits drawing the most', async () => {
+  const world = await createWorld();
   try {
-    const content = await getContent();
+    const ack = await get(world, { device: 'ext:test-integration:vue:480001' });
+    assert.equal(ack.success, true);
+    const content = ack.data.content;
     assert.deepEqual(validateWidgetContent(content), []);
-    const status = content.components.find((component) => component.type === 'status');
-    assert.ok(
-      status.items.some((item) => item.color === 'warning'),
-      'degraded shows a warning',
+
+    const [total, solar, status] = content.components;
+    assert.equal(total.device_feature, 'ext:test-integration:vue:480001:total-power');
+    assert.equal(total.label, 'Réseau'); // solar Vue: the mains is the grid exchange
+    assert.equal(solar.value, 3100);
+    assert.deepEqual(
+      status.items.map((item) => item.label),
+      ['A/C', 'Heat pump', 'Kitchen', 'Furnace', 'Office'],
     );
+    // No share of a net grid exchange.
+    assert.equal(status.items[0].value, '2 300 W');
+
+    // Every bound feature exists on the discovered devices.
+    const features = new Set(
+      world.gladys.fake.discoveredDevices.flatMap((d) => d.features.map((f) => f.external_id)),
+    );
+    for (const component of content.components.filter((c) => c.device_feature)) {
+      assert.ok(features.has(component.device_feature), component.device_feature);
+    }
   } finally {
-    simulateLanSession(true);
+    await world.close();
   }
 });
 
-test('the live tiles reference features the integration publishes', async () => {
-  const featureIds = new Set(
-    buildDiscoveredDevices(gladys, config).flatMap((device) =>
-      device.features.map((feature) => feature.external_id),
-    ),
-  );
-  const liveTiles = (await getContent()).components.filter((c) => c.device_feature);
-  assert.ok(liveTiles.length > 0, 'the template demonstrates a device-bound tile');
-  for (const tile of liveTiles) {
-    assert.ok(featureIds.has(tile.device_feature), `unknown feature ${tile.device_feature}`);
+test('on a Vue without solar, each circuit shows its share of the total', async () => {
+  const world = await createWorld();
+  try {
+    const ack = await get(world, { device: 'ext:test-integration:vue:480002' }, 'en');
+    const content = ack.data.content;
+    assert.deepEqual(validateWidgetContent(content), []);
+    assert.equal(content.components[0].label, 'Total');
+    assert.equal(content.components[1].items[0].label, 'Compressor');
+    assert.equal(content.components[1].items[0].value, '1,200 W · 61 %');
+  } finally {
+    await world.close();
   }
 });
 
-test('every button action of the content is handled and answers a short toast', async () => {
-  const buttons = (await getContent()).components.filter((c) => c.type === 'button' && c.action);
-  assert.ok(buttons.length > 0, 'the template demonstrates a widget action');
-  for (const { action } of buttons) {
-    const message = await demoStatus.action(gladys, {
-      actionKey: action.key,
-      params: action.params ?? {},
-      settings: {},
-      config,
-    });
-    assert.ok(message.en, 'the toast carries at least the mandatory `en` text');
-    assert.ok(message.en.length <= 200, 'toasts are capped at 200 characters');
+test('without settings, the first Vue; an outlet or an unknown device asks for a Vue', async () => {
+  const world = await createWorld();
+  try {
+    const first = await get(world, {}, 'de');
+    assert.equal(first.data.content.components[0].device_feature.split(':')[3], '480001');
+    const outlet = await get(world, { device: 'ext:test-integration:outlet:480010' }, 'es');
+    assert.deepEqual(outlet.data.content.components, [
+      { type: 'text', variant: 'body', text: TEXT.widgetPickVue.es },
+    ]);
+  } finally {
+    await world.close();
   }
 });
 
-test('an unknown widget action fails, so the user sees the error', async () => {
-  await assert.rejects(
-    demoStatus.action(gladys, { actionKey: 'unknown', params: {}, settings: {}, config }),
-    /Unknown widget action/,
-  );
-});
-
-test('refreshWidgets nudges every widget', () => {
-  const fresh = createFakeGladys();
-  refreshWidgets(fresh);
-  assert.deepEqual(fresh.fake.widgetRefreshes, Object.keys(WIDGETS));
+test('not configured: the widget says so', async () => {
+  const world = await createWorld({ config: { email: '' }, addAll: false });
+  try {
+    const ack = await get(world, {}, 'en');
+    assert.equal(ack.data.content.components[0].text, TEXT.notConfigured.en);
+  } finally {
+    await world.close();
+  }
 });
